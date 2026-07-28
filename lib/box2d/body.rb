@@ -12,17 +12,19 @@ module Box2D
     }.freeze
     TYPE_VALUES = TYPES.invert.freeze
 
-    attr_reader :shapes, :chains
+    attr_reader :shapes, :chains, :joints
 
     def initialize(world, id)
       super
       @shapes = []
       @chains = []
+      @joints = []
     end
 
     def destroy
       ensure_valid!
       Native.b2DestroyBody(@id)
+      @joints.dup.each(&:invalidate_from_body!)
       @shapes.each { |shape| shape.send(:invalidate!) }
       @chains.each { |chain| chain.send(:invalidate!) }
       invalidate!
@@ -150,6 +152,15 @@ module Box2D
 
     def unregister_chain(chain)
       @chains.delete(chain)
+    end
+
+    def register_joint(joint)
+      @joints << joint
+      joint
+    end
+
+    def unregister_joint(joint)
+      @joints.delete(joint)
     end
 
     protected

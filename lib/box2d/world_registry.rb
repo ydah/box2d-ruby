@@ -30,6 +30,11 @@ module Box2D
       chain
     end
 
+    def register_joint(joint)
+      @joints[ValueConversion.id_key(joint.id)] = joint
+      joint
+    end
+
     def unregister_body(body)
       @bodies.delete(ValueConversion.id_key(body.id))
       @body_user_data.delete(ValueConversion.id_key(body.id))
@@ -45,6 +50,10 @@ module Box2D
 
     def unregister_chain(chain)
       @chains.delete(ValueConversion.id_key(chain.id))
+    end
+
+    def unregister_joint(joint)
+      @joints.delete(ValueConversion.id_key(joint.id))
     end
 
     def body_user_data(body)
@@ -69,12 +78,13 @@ module Box2D
       @bodies = {}
       @shapes = {}
       @chains = {}
+      @joints = {}
       @body_user_data = {}
       @shape_user_data = {}
     end
 
     def clear_registries
-      [@bodies, @shapes, @chains].each do |registry|
+      [@bodies, @shapes, @chains, @joints].each do |registry|
         registry.each_value { |handle| handle.send(:invalidate!) }
         registry.clear
       end

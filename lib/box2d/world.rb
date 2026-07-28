@@ -4,6 +4,7 @@ module Box2D
   class World
     include WorldRegistry
     include BodyDefinition
+    include WorldJoints
 
     BODY_TYPES = Body::TYPE_VALUES
 
@@ -18,6 +19,7 @@ module Box2D
       @id = Native.b2CreateWorld(definition.pointer)
       @destroyed = false
       @stepping = false
+      @drawing = false
       initialize_registries
       @events = Events.empty
       self.substeps = substeps
@@ -29,7 +31,7 @@ module Box2D
     end
 
     def valid?
-      raise ReentrantStepError, "the world cannot be accessed while step is running" if @stepping
+      raise ReentrantStepError, "the world cannot be accessed during a native operation" if @stepping || @drawing
 
       !@destroyed && Native.b2World_IsValid(@id)
     end
@@ -136,9 +138,26 @@ module Box2D
       self
     end
 
+    def debug_draw(flags: [:shapes])
+      raise ArgumentError, "a debug draw block is required" unless block_given?
+
+      ensure_access!
+      @debug_draw = DebugDraw.new(flags) { |command| yield command }
+      @drawing = true
+      begin
+        Native.b2World_Draw(@id, @debug_draw.definition.pointer)
+      ensure
+        @drawing = false
+      end
+      @debug_draw.raise_callback_error
+      self
+    end
+
     def ensure_access!
       raise UseAfterDestroyError, "Box2D::World has been destroyed" if @destroyed
-      raise ReentrantStepError, "the world cannot be accessed while step is running" if @stepping
+      if @stepping || @drawing
+        raise ReentrantStepError, "the world cannot be accessed during a native operation"
+      end
 
       true
     end
