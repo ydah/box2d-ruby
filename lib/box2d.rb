@@ -9,3 +9,4 @@ module Box2D
 end
 
 require_relative "box2d/native_loader"
+require_relative "box2d/native"

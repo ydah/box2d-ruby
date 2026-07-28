@@ -11,6 +11,7 @@
 /ext/box2d/native.bundle
 /ext/box2d/native.dll
 /ext/box2d/native.so
+/ext/box2d/native.bundle.dSYM/
 /pkg/
 /spec/reports/
 /tmp/
