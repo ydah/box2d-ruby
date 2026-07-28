@@ -50,12 +50,18 @@ module Box2D
       geometry = Native::Segment.new
       geometry[:point1] = ValueConversion.native_vec2(point1, label: "point1")
       geometry[:point2] = ValueConversion.native_vec2(point2, label: "point2")
+      validate_separation!(geometry[:point1], geometry[:point2], label: "segment endpoints")
       create_shape(:b2CreateSegmentShape, geometry, options)
     end
 
     def chain(points, loop: false, **options)
       ensure_valid!
       point_buffer, count = native_points(points, minimum: 4)
+      if loop
+        first = Native::Vec2.new(point_buffer)
+        last = Native::Vec2.new(point_buffer + (count - 1) * Native::Vec2.size)
+        validate_separation!(last, first, label: "loop endpoints")
+      end
       definition = Native.b2DefaultChainDef
       definition[:points] = point_buffer
       definition[:count] = count
@@ -98,7 +104,21 @@ module Box2D
         vector = ValueConversion.native_vec2(point, label: "points[#{index}]")
         pointer.put_bytes(index * Native::Vec2.size, vector.pointer.read_bytes(Native::Vec2.size))
       end
+      validate_chain_points!(pointer, values.length) if minimum >= 4
       [pointer, values.length]
+    end
+
+    def validate_chain_points!(pointer, count)
+      points = Array.new(count) { |index| Native::Vec2.new(pointer + index * Native::Vec2.size) }
+      points.each_cons(2) { |point1, point2| validate_separation!(point1, point2, label: "adjacent chain points") }
+    end
+
+    def validate_separation!(point1, point2, label:)
+      minimum = 0.005 * Native.b2GetLengthUnitsPerMeter
+      distance_squared = (point2[:x] - point1[:x])**2 + (point2[:y] - point1[:y])**2
+      return if distance_squared > minimum**2
+
+      raise ArgumentError, "#{label} must be more than #{minimum} units apart"
     end
 
     def configure_material(material, options)

@@ -21,6 +21,16 @@ RSpec.describe Box2D::FixedStepper do
     expect(alpha).to be_within(1e-12).of(0.0)
   end
 
+  it "does not lose an exact step to floating-point rounding" do
+    stepper = described_class.new(hz: 10, max_substeps: 3)
+    count = 0
+
+    alpha = stepper.advance(0.3) { count += 1 }
+
+    expect(count).to eq(3)
+    expect(alpha).to eq(0.0)
+  end
+
   it "rejects invalid configuration and deltas" do
     expect { described_class.new(hz: 0) }.to raise_error(ArgumentError)
     expect { described_class.new(max_substeps: 0) }.to raise_error(ArgumentError)

@@ -20,13 +20,15 @@ module Box2D
       @accumulator = [@accumulator + delta, @step * @max_substeps].min
 
       steps = 0
-      while @accumulator >= @step && steps < @max_substeps
+      epsilon = @step * 1e-12
+      while @accumulator + epsilon >= @step && steps < @max_substeps
         yield @step
         @accumulator -= @step
+        @accumulator = 0.0 if @accumulator.abs < epsilon
         steps += 1
       end
 
-      @accumulator / @step
+      [@accumulator / @step, 1.0 - Float::EPSILON].min
     end
 
     def reset

@@ -11,9 +11,11 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Idiomatic Ruby bindings for the Box2D v3 physics engine"
   spec.description = "A generated FFI binding and memory-safe Ruby API for Box2D v3."
+  spec.homepage = "https://rubygems.org/gems/box2d-ruby"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
   spec.metadata["rubygems_mfa_required"] = "true"
+  spec.metadata["homepage_uri"] = spec.homepage
 
   spec.files = Dir.chdir(__dir__) do
     Dir[

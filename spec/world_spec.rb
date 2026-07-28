@@ -149,5 +149,9 @@ RSpec.describe Box2D::World do
     expect { world.create_body(position: [0]) }.to raise_error(ArgumentError, /two components/)
     expect { world.substeps = 0 }.to raise_error(ArgumentError, /substeps/)
     expect { world.step(Float::NAN) }.to raise_error(ArgumentError, /finite/)
+    expect do
+      world.create_body { |body| body.segment([0, 0], [0, 0]) }
+    end.to raise_error(ArgumentError, /segment endpoints/)
+    expect { world.overlap_aabb([1, 1], [-1, -1]) {} }.to raise_error(ArgumentError, /AABB/)
   end
 end

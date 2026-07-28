@@ -131,6 +131,9 @@ module Box2D
       bounds = Native::AABB.new
       bounds[:lowerBound] = ValueConversion.native_vec2(lower, label: "lower")
       bounds[:upperBound] = ValueConversion.native_vec2(upper, label: "upper")
+      if bounds[:lowerBound][:x] > bounds[:upperBound][:x] || bounds[:lowerBound][:y] > bounds[:upperBound][:y]
+        raise ArgumentError, "lower AABB bound must not exceed upper bound"
+      end
       callback = FFI::Function.new(:bool, [Native::ShapeId.by_value, :pointer]) do |shape_id, _context|
         block.call(shape_for_id(shape_id)) != false
       end
