@@ -93,6 +93,42 @@ RSpec.describe Box2D::World do
     expect(overlaps.map(&:body)).to include(body)
   end
 
+  it "performs exact circle, capsule, and polygon overlap queries" do
+    world = create_world(gravity: [0, 0])
+    origin = world.create_body { |body| body.circle(radius: 0.2) }
+    right = world.create_body(position: [3, 0]) { |body| body.box(0.2, 0.2) }
+    corner = world.create_body(position: [2, 2]) { |body| body.box(0.2, 0.2) }
+
+    circles = world.overlap_circle([0, 0], radius: 0.4).map(&:body)
+    capsules = world.overlap_capsule([2.5, 0], [3.5, 0], radius: 0.2).map(&:body)
+    polygons = world.overlap_polygon(
+      [[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]],
+      position: [2, 2],
+      angle: 0.3
+    ).map(&:body)
+
+    expect(circles).to contain_exactly(origin)
+    expect(capsules).to contain_exactly(right)
+    expect(polygons).to contain_exactly(corner)
+  end
+
+  it "stops overlap queries on false and propagates callback errors safely" do
+    world = create_world
+    2.times { |index| world.create_body(position: [index, 0]) { |body| body.circle(radius: 1) } }
+    visited = []
+
+    result = world.overlap_circle([0.5, 0], radius: 2) do |shape|
+      visited << shape
+      false
+    end
+
+    expect(result).to equal(world)
+    expect(visited.length).to eq(1)
+    expect do
+      world.overlap_circle([0.5, 0], radius: 2) { raise "query failed" }
+    end.to raise_error("query failed")
+  end
+
   it "invalidates child handles when their owner is destroyed" do
     world = create_world
     body = world.create_body { |builder| builder.box(1, 1) }
@@ -153,5 +189,9 @@ RSpec.describe Box2D::World do
       world.create_body { |body| body.segment([0, 0], [0, 0]) }
     end.to raise_error(ArgumentError, /segment endpoints/)
     expect { world.overlap_aabb([1, 1], [-1, -1]) {} }.to raise_error(ArgumentError, /AABB/)
+    expect { world.overlap_circle([0, 0], radius: 0) {} }.to raise_error(ArgumentError, /radius/)
+    expect do
+      world.overlap_polygon([[0, 0], [1, 0], [2, 0]]) {}
+    end.to raise_error(ArgumentError, /convex hull/)
   end
 end

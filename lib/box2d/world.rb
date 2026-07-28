@@ -5,6 +5,7 @@ module Box2D
     include WorldRegistry
     include BodyDefinition
     include WorldJoints
+    include WorldQueries
 
     BODY_TYPES = Body::TYPE_VALUES
 
@@ -104,41 +105,6 @@ module Box2D
         raise
       end
       body
-    end
-
-    def raycast(from, to, filter: {})
-      ensure_access!
-      origin = ValueConversion.native_vec2(from, label: "from")
-      destination = ValueConversion.native_vec2(to, label: "to")
-      translation = Native::Vec2.new
-      translation[:x] = destination[:x] - origin[:x]
-      translation[:y] = destination[:y] - origin[:y]
-      result = Native.b2World_CastRayClosest(@id, origin, translation, ShapeDefinition.query_filter(filter))
-      return unless result[:hit]
-
-      Hit.new(
-        shape: shape_for_id(result[:shapeId]),
-        point: ValueConversion.vec2(result[:point]),
-        normal: ValueConversion.vec2(result[:normal]),
-        fraction: result[:fraction]
-      )
-    end
-
-    def overlap_aabb(lower, upper, filter: {}, &block)
-      return enum_for(__method__, lower, upper, filter:) unless block
-
-      ensure_access!
-      bounds = Native::AABB.new
-      bounds[:lowerBound] = ValueConversion.native_vec2(lower, label: "lower")
-      bounds[:upperBound] = ValueConversion.native_vec2(upper, label: "upper")
-      if bounds[:lowerBound][:x] > bounds[:upperBound][:x] || bounds[:lowerBound][:y] > bounds[:upperBound][:y]
-        raise ArgumentError, "lower AABB bound must not exceed upper bound"
-      end
-      callback = FFI::Function.new(:bool, [Native::ShapeId.by_value, :pointer]) do |shape_id, _context|
-        block.call(shape_for_id(shape_id)) != false
-      end
-      Native.b2World_OverlapAABB(@id, bounds, ShapeDefinition.query_filter(filter), callback, nil)
-      self
     end
 
     def debug_draw(flags: [:shapes])

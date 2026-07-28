@@ -164,9 +164,19 @@ end
 world.overlap_aabb([-2, -2], [2, 2]) do |shape|
   p shape
 end
+
+world.overlap_circle([0, 1], radius: 0.5) { |shape| p shape }
+world.overlap_capsule([-1, 0], [1, 0], radius: 0.25) { |shape| p shape }
+world.overlap_polygon(
+  [[-1, -1], [1, -1], [1, 1], [-1, 1]],
+  position: [4, 0],
+  angle: Math::PI / 4
+) { |shape| p shape }
 ```
 
-Both methods accept `filter: {category:, mask:}`.
+All query methods accept `filter: {category:, mask:}`. Without a block, overlap
+queries return an `Enumerator`. Returning `false` from the block stops the
+query.
 
 ## Joints
 
