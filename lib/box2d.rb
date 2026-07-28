@@ -2,7 +2,10 @@
 
 require_relative "box2d/version"
 
-module Box2d
+module Box2D
   class Error < StandardError; end
-  # Your code goes here...
+  class LoadError < Error; end
+  class UseAfterDestroyError < Error; end
 end
+
+require_relative "box2d/native_loader"

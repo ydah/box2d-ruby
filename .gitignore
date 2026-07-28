@@ -5,6 +5,12 @@
 /_yardoc/
 /coverage/
 /doc/
+/ext/box2d/Makefile
+/ext/box2d/*.o
+/ext/box2d/mkmf.log
+/ext/box2d/native.bundle
+/ext/box2d/native.dll
+/ext/box2d/native.so
 /pkg/
 /spec/reports/
 /tmp/

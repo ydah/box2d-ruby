@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe Box2d do
+RSpec.describe Box2D do
   it "has a version number" do
-    expect(Box2d::VERSION).not_to be nil
+    expect(described_class::VERSION).to eq("0.1.0")
   end
 
-  it "does something useful" do
-    expect(false).to eq(true)
+  it "keeps the generated gem namespace compatible with the original skeleton" do
+    expect(Box2d).to equal(described_class)
   end
 end
