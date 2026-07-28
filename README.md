@@ -35,8 +35,9 @@ gem install box2d-ruby
 ```
 
 Platform gems contain a precompiled Box2D library. The source gem falls back to
-building the vendored C17 source and requires a C compiler, `make`, and Ruby
-development headers.
+building the vendored C17 source with CMake and requires CMake 3.16 or newer, a
+C compiler, `make` (or another CMake build backend), and Ruby development
+headers.
 
 The runtime dependency is `ffi`. `larb` is optional: if it is already loaded,
 vector-returning APIs produce `Larb::Vec2`; otherwise they return two-element

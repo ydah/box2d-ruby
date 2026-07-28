@@ -14,13 +14,14 @@ extension_path = File.join(extension_directory, extension_name)
 
 CLEAN.include(
   File.join(extension_directory, "Makefile"),
+  File.join(extension_directory, "cmake-build"),
   File.join(extension_directory, "mkmf.log"),
   extension_path,
   File.join(extension_directory, "*.o")
 )
 
 namespace :native do
-  desc "Compile the vendored Box2D native extension"
+  desc "Compile the vendored Box2D native extension with CMake"
   task :compile do
     Dir.chdir(extension_directory) do
       sh RbConfig.ruby, "extconf.rb"

@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir.chdir(__dir__) do
     Dir[
       "lib/**/*",
+      "ext/box2d/CMakeLists.txt",
       "ext/box2d/extconf.rb",
       "ext/box2d/native.c",
       "ext/box2d/vendor/**/*",
