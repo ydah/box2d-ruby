@@ -1,32 +1,49 @@
-name: Ruby
+name: CI
 
 on:
   push:
-    branches:
-      - main
-
+    branches: [main]
   pull_request:
 
 permissions:
   contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }}
+  test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        ruby:
-          - '4.0'
+        include:
+          - name: Ruby 3.2 / x86_64 Linux
+            os: ubuntu-24.04
+            ruby: "3.2"
+          - name: Ruby 3.4 / x86_64 Linux
+            os: ubuntu-24.04
+            ruby: "3.4"
+          - name: Ruby 4.0 / x86_64 Linux
+            os: ubuntu-24.04
+            ruby: "4.0"
+          - name: Ruby 4.0 / aarch64 Linux
+            os: ubuntu-24.04-arm
+            ruby: "4.0"
+          - name: Ruby 4.0 / arm64 macOS
+            os: macos-15
+            ruby: "4.0"
+          - name: Ruby 4.0 / x86_64 macOS
+            os: macos-15-intel
+            ruby: "4.0"
+          - name: Ruby 4.0 / x64 Windows
+            os: windows-2025
+            ruby: "4.0"
 
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - name: Run the default task
-        run: bundle exec rake
+      - run: bundle exec rake
