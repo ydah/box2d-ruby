@@ -3,6 +3,7 @@
 require_relative "lib/box2d/version"
 
 Gem::Specification.new do |spec|
+  precompiled = ENV["BOX2D_PRECOMPILED"] == "true"
   spec.name = "box2d-ruby"
   spec.version = Box2D::VERSION
   spec.authors = ["Yudai Takada"]
@@ -14,15 +15,35 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 3.2.0"
   spec.metadata["rubygems_mfa_required"] = "true"
 
-  gemspec = File.basename(__FILE__)
-  spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
-    ls.readlines("\x0", chomp: true).reject do |file|
-      file == gemspec || file.start_with?(*%w[bin/ Gemfile .gitignore .rspec spec/ .github/ .idea/ .serena/])
+  spec.files = Dir.chdir(__dir__) do
+    Dir[
+      "lib/**/*",
+      "ext/box2d/extconf.rb",
+      "ext/box2d/native.c",
+      "ext/box2d/vendor/**/*",
+      "generator/**/*",
+      "script/**/*",
+      "examples/**/*",
+      "README.md",
+      "LICENSE.txt"
+    ].select { |file| File.file?(file) }
+  end
+  if precompiled
+    native_library = Dir[File.join(__dir__, "lib/box2d/native.{bundle,so,dll}")].first
+    raise "precompiled native library is missing" unless native_library
+
+    spec.files.reject! { |file| file.start_with?("ext/", "generator/", "script/") }
+    spec.files << native_library.delete_prefix("#{__dir__}/")
+    local_platform = Gem::Platform.local
+    spec.platform = if local_platform.os == "darwin"
+      Gem::Platform.new([local_platform.cpu, "darwin", nil])
+    else
+      local_platform
     end
   end
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |file| File.basename(file) }
-  spec.extensions = ["ext/box2d/extconf.rb"]
+  spec.extensions = ["ext/box2d/extconf.rb"] unless precompiled
   spec.require_paths = ["lib"]
 
   spec.add_dependency "ffi", "~> 1.17"

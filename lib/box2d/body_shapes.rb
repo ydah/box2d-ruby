@@ -103,9 +103,8 @@ module Box2D
 
     def configure_material(material, options)
       material[:friction] = ValueConversion.non_negative_float(options.fetch(:friction, 0.6), label: "friction")
-      material[:restitution] = ShapeDefinition.send(:coefficient, options.fetch(:restitution, 0.0), "restitution")
-      material[:rollingResistance] = ShapeDefinition.send(
-        :coefficient,
+      material[:restitution] = ShapeDefinition.coefficient(options.fetch(:restitution, 0.0), "restitution")
+      material[:rollingResistance] = ShapeDefinition.coefficient(
         options.fetch(:rolling_resistance, 0.0),
         "rolling_resistance"
       )

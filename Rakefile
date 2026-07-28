@@ -27,6 +27,11 @@ namespace :native do
       sh ENV.fetch("MAKE", "make")
     end
   end
+
+  desc "Build a platform gem containing the compiled native library"
+  task package: :compile do
+    sh RbConfig.ruby, "script/build_platform_gem.rb"
+  end
 end
 
 namespace :bindings do

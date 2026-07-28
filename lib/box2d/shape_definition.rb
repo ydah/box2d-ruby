@@ -40,6 +40,5 @@ module Box2D
 
       raise ArgumentError, "#{label} must be between 0 and 1"
     end
-    private_class_method :coefficient
   end
 end

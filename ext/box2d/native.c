@@ -1,5 +1,9 @@
-#include <ruby.h>
+#if defined(_WIN32)
+#define BOX2D_RUBY_EXPORT __declspec(dllexport)
+#else
+#define BOX2D_RUBY_EXPORT __attribute__((visibility("default")))
+#endif
 
-RUBY_FUNC_EXPORTED void Init_native(void)
+BOX2D_RUBY_EXPORT void Init_native(void)
 {
 }

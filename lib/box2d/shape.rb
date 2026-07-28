@@ -64,7 +64,7 @@ module Box2D
 
     def restitution=(value)
       ensure_valid!
-      Native.b2Shape_SetRestitution(@id, ShapeDefinition.send(:coefficient, value, "restitution"))
+      Native.b2Shape_SetRestitution(@id, ShapeDefinition.coefficient(value, "restitution"))
     end
 
     def filter

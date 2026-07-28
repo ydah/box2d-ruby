@@ -5,13 +5,22 @@ module Box2D
     ID_CLASS = Native::JointId
 
     attr_reader :body_a, :body_b
-    attr_accessor :user_data
 
     def initialize(world, id, body_a:, body_b:, user_data: nil)
       super(world, id)
       @body_a = body_a
       @body_b = body_b
       @user_data = user_data
+    end
+
+    def user_data
+      ensure_valid!
+      @user_data
+    end
+
+    def user_data=(value)
+      ensure_valid!
+      @user_data = value
     end
 
     def destroy
