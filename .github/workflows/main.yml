@@ -19,24 +19,31 @@ jobs:
           - name: Ruby 3.2 / x86_64 Linux
             os: ubuntu-24.04
             ruby: "3.2"
+            command: bundle exec rake
           - name: Ruby 3.4 / x86_64 Linux
             os: ubuntu-24.04
             ruby: "3.4"
+            command: bundle exec rake
           - name: Ruby 4.0 / x86_64 Linux
             os: ubuntu-24.04
             ruby: "4.0"
+            command: bundle exec rake
           - name: Ruby 4.0 / aarch64 Linux
             os: ubuntu-24.04-arm
             ruby: "4.0"
+            command: bundle exec rake
           - name: Ruby 4.0 / arm64 macOS
             os: macos-15
             ruby: "4.0"
+            command: bundle exec rake bindings:check native:verify_package
           - name: Ruby 4.0 / x86_64 macOS
             os: macos-15-intel
             ruby: "4.0"
+            command: bundle exec rake bindings:check native:verify_package
           - name: Ruby 4.0 / x64 Windows
             os: windows-2025
             ruby: "4.0"
+            command: bundle exec rake bindings:check native:verify_package
 
     steps:
       - uses: actions/checkout@v6
@@ -46,4 +53,4 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - run: bundle exec rake
+      - run: ${{ matrix.command }}

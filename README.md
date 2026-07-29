@@ -256,6 +256,11 @@ the fixture for the current platform after an intentional solver change with:
 bundle exec rake snapshots:update
 ```
 
+`bundle exec rake native:verify_package` additionally builds a platform gem,
+extracts its packaged library, and reruns the full suite against that exact
+artifact. Release CI performs this check for all five supported targets before
+uploading any gem.
+
 ## Ownership and destruction
 
 `World` owns every native body, shape, chain, and joint. Ruby wrappers are

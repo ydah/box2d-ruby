@@ -5,6 +5,7 @@ require "rspec/core/rake_task"
 require "rake/clean"
 require "rbconfig"
 require "tmpdir"
+require_relative "lib/box2d/version"
 
 RSpec::Core::RakeTask.new(:spec)
 
@@ -32,6 +33,17 @@ namespace :native do
   desc "Build a platform gem containing the compiled native library"
   task package: :compile do
     sh RbConfig.ruby, "script/build_platform_gem.rb"
+  end
+
+  desc "Run the full spec suite against the packaged native library"
+  task verify_package: :package do
+    source_gem = "box2d-ruby-#{Box2D::VERSION}.gem"
+    platform_gem = Dir[File.join("pkg", "box2d-ruby-#{Box2D::VERSION}-*.gem")]
+      .reject { |path| File.basename(path) == source_gem }
+      .max_by { |path| File.mtime(path) }
+    abort "the platform gem was not built" unless platform_gem
+
+    sh RbConfig.ruby, "script/verify_platform_gem.rb", platform_gem
   end
 end
 
