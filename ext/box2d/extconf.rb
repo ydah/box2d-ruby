@@ -7,12 +7,16 @@ cmake = find_executable("cmake")
 abort "CMake 3.16 or newer is required to build box2d-ruby from source" unless cmake
 
 build_directory = File.expand_path("cmake-build", __dir__)
+host_os = RbConfig::CONFIG.fetch("host_os")
 configure = [
   cmake,
   "-S", __dir__,
   "-B", build_directory,
   "-DCMAKE_BUILD_TYPE=Release"
 ]
+if host_os.match?(/mingw/) && !ENV["CMAKE_GENERATOR"]
+  configure.concat(["-G", "MinGW Makefiles", "-DCMAKE_C_COMPILER=#{RbConfig::CONFIG.fetch("CC")}"])
+end
 build = [cmake, "--build", build_directory, "--config", "Release", "--target", "box2d_vendor"]
 
 abort "CMake configuration failed for vendored Box2D" unless system(*configure)
@@ -26,7 +30,7 @@ $LIBRUBYARG_SHARED = ""
 $LIBRUBYARG_STATIC = ""
 
 escaped_archive = Shellwords.escape(archive)
-case RbConfig::CONFIG.fetch("host_os")
+case host_os
 when /darwin/
   $LDFLAGS << " -Wl,-force_load,#{escaped_archive}"
 when /mswin/

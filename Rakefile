@@ -60,5 +60,12 @@ namespace :bindings do
   end
 end
 
+namespace :snapshots do
+  desc "Update the deterministic snapshot for the current platform"
+  task update: "native:compile" do
+    sh RbConfig.ruby, "script/update_deterministic_snapshot.rb"
+  end
+end
+
 task spec: "bindings:check"
 task default: :spec

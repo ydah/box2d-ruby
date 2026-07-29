@@ -230,6 +230,32 @@ end
 The owning world retains every `FFI::Function` used by the draw session, so GC
 cannot collect a callback while native code is using it.
 
+Runnable line-renderer examples are included for both supported rendering
+styles:
+
+```sh
+gem install rugl glfw
+ruby examples/rugl_debug_draw.rb
+
+gem install stagecraft
+ruby examples/stagecraft_debug_draw.rb
+```
+
+Both adapters consume the same `Box2DDebugLines` converter in
+`examples/support`, which turns debug callbacks into colored line-list
+vertices.
+
+## Verification
+
+`bundle exec rake` builds the CMake extension, checks all generated FFI struct
+layouts, and runs the complete spec suite. Deterministic 100-body fixtures live
+under `spec/snapshots/100_boxes` for every supported native-gem target. Update
+the fixture for the current platform after an intentional solver change with:
+
+```sh
+bundle exec rake snapshots:update
+```
+
 ## Ownership and destruction
 
 `World` owns every native body, shape, chain, and joint. Ruby wrappers are
