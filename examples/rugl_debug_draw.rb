@@ -6,7 +6,11 @@ require_relative "support/box2d_debug_lines"
 
 world = nil
 rugl = nil
-begin
+at_exit do
+  world&.destroy if world&.valid?
+  rugl&.destroy unless rugl&.destroyed?
+end
+
 world = Box2D::World.new
 world.create_body(position: [0, -1]) { |body| body.box(8, 1) }
 10.times do |index|
@@ -61,8 +65,4 @@ rugl.frame do |context|
 
   rugl.clear(color: [0.04, 0.05, 0.08, 1.0])
   draw_lines.call(count: lines.positions.length)
-end
-ensure
-  world&.destroy if world&.valid?
-  rugl&.destroy unless rugl&.destroyed?
 end

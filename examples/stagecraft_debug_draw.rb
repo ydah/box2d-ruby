@@ -6,7 +6,14 @@ require_relative "support/box2d_debug_lines"
 
 world = nil
 app = nil
-begin
+at_exit do
+  world&.destroy if world&.valid?
+  if app && !app.renderer.disposed?
+    app.renderer.dispose
+    app.window.close
+  end
+end
+
 world = Box2D::World.new
 world.create_body(position: [0, -1]) { |body| body.box(8, 1) }
 10.times do |index|
@@ -54,11 +61,4 @@ app.run do |delta_time|
   geometry.dispose
   geometry = next_geometry
   app.renderer.render(scene, camera)
-end
-ensure
-  world&.destroy if world&.valid?
-  if app && !app.renderer.disposed?
-    app.renderer.dispose
-    app.window.close
-  end
 end

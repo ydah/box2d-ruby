@@ -6,6 +6,14 @@ shapes, events, queries, joints, and debug drawing.
 
 The gem currently vendors Box2D 3.1.0.
 
+## API stability
+
+Version 1.0 freezes the documented Ruby API. Releases in the 1.x series follow
+semantic versioning: existing public methods and their documented behavior will
+remain compatible, and breaking changes require a new major version. The
+generated `Box2D::Native` layer mirrors the vendored Box2D headers exactly and
+is regenerated when that native dependency is intentionally upgraded.
+
 ## Units and coordinates
 
 Box2D uses SI units: meters, kilograms, seconds, and radians. It has no built-in
